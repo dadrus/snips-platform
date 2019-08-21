@@ -4,7 +4,7 @@ Yes, it seems, there are a couple Docker images for [snips.ai](https://snips.ai/
 Unfortunately I couldn't use any of these to just go my first steps with
 snips by following the official [Quick Start Console](https://docs.snips.ai/getting-started/quick-start-console)
 tutorial and then trying to deploy the results in a Docker container instead
-of using `snips-sam` as e.g. described in [Quick Start Raspberry Pi](https://docs.snips.ai/getting-started/quick-start-raspberry-pi)
+of using [SAM](https://docs.snips.ai/reference/sam) as e.g. described in [Quick Start Raspberry Pi](https://docs.snips.ai/getting-started/quick-start-raspberry-pi)
 or [Raspiaudio MIC+ Snips tutorial](https://www.instructables.com/id/VOCAL-ASSISTANT-SnipsAi-Protects-Your-Privacy/). So this project was born.
 
 ## My Current HW-Setup
@@ -165,9 +165,12 @@ Now you can talk to your assistant.
 
 ## TODOs
 
-* Support satellite setups
-* Strip down the Docker image. It is 864MB in size.
+* Fail if no *assistant* directory is provided or it is empty
+* Support [satellite setups](https://docs.snips.ai/articles/platform/satellites)
+* Strip down the Docker image size. It is 864MB in size.
 * Write documentation about the Docker image expectations, like expected volumes, exposed ports, etc
+* Set the timezone used by the host instead of using *Europe/Amsterdam*
+* Reuse already installed dependencies on restarting the docker container instead deploying the assistant from scratch (this will reduce the start time).
 * Deploy to Docker Hub
 
 
