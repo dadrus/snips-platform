@@ -9,7 +9,7 @@ or [Raspiaudio MIC+ Snips tutorial](https://www.instructables.com/id/VOCAL-ASSIS
 
 ## My Current HW-Setup
 
-- [Raspberry Pi 3](https://www.amazon.com/Raspberry-1373331-Pi-Modell-Mainboard/dp/B07BDR5PDW/ref=sr_1_3?__mk_de_DE=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=1FJGK88YIA93Z&keywords=raspberry+pi+3&qid=1566326809&s=gateway&sprefix=raspberr%2Caps%2C175&sr=8-3)
+- [Raspberry Pi 3](https://www.raspberrypi.org/products/raspberry-pi-3-model-b-plus/)
 - [Raspiaudio MIC+](https://www.raspiaudio.com/raspiaudio-aiy)
 
 ## Software-Stack
