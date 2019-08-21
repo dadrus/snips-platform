@@ -95,7 +95,7 @@ to adjust the `asound.conf` configuration file to reference the appropriate play
 for Raspiaudio MIC+ (see above) already does it, so no specific settings are required.
 
 Given the above prerequisites are in place, just follow the tutorial of your choice (e.g. one of the referenced above) to create your snips 
-assistant. When ready download it from the snips console (in the below right corner of the web page you'll find a button named *Deply Assistant*).
+assistant. When ready download it from the snips console (in the below right corner of the web page you'll find a button named *Deploy Assistant*).
 You'll receve a zip file, which you'll need to extract.
 
 Time to build the Docker image. Just execute the `build.sh` script from this repository:
