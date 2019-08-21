@@ -83,10 +83,7 @@ available to it
 $ docker run -ti --rm -v /etc/asound.conf --device /dev/snd raspbian/stretch /bin/bash
 ```
 
-and repeat the tests described above in the container. You will have to install `alsa-utils` to be able to use `aplay` and `arecord`
-To verify the installed sound/mic device can also be used in a Docker
-container it is worth to run the above test or alternatively use `arecord`
-and `asound` commands in a container:
+and repeat the tests described above in the container. You will have to install `alsa-utils` to be able to use `aplay` and `arecord`:
 
 
 ```.bash
