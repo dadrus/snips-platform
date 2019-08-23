@@ -80,7 +80,7 @@ to adjust the `asound.conf` configuration file to reference the appropriate play
 In my case the I was able to use the `/etc/asound.conf` as it is, without
 any modifications.
 
-###Driver for the ReSpeaker 2 Mic Array for PI
+### Driver for the ReSpeaker 2 Mic Array for PI
 
 As described on the [wiki Page](http://wiki.seeedstudio.com/ReSpeaker_2_Mics_Pi_HAT/)
 from seeedstudio one have to get the seeed voice card source code, install
@@ -155,7 +155,7 @@ Please note, that we just used the system `/etc/asound.conf` without
 modifications, as we're addressed the proper devices by using `-Dhw:1`
 `arecord` and `aplay` arguments.
 
-###Snips Assistant & Docker Image
+### Snips Assistant & Docker Image
 
 Given the above prerequisites are in place, just follow the tutorial of your choice (e.g. one of the referenced above) to create your snips 
 assistant. When ready download it from the snips console (in the below right corner of the web page you'll find a button named *Deploy Assistant*).
