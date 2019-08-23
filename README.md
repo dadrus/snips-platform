@@ -252,9 +252,8 @@ Now you can talk to your assistant.
 
 * Fail if no *assistant* directory is provided or it is empty
 * Support [satellite setups](https://docs.snips.ai/articles/platform/satellites)
-* Strip down the Docker image size. It is 864MB in size.
 * Write documentation about the Docker image expectations, like expected volumes, exposed ports, etc
-* Set the timezone used by the host instead of using *Europe/Amsterdam*
+* Set the timezone used by the host
 * Reuse already installed dependencies on restarting the docker container instead deploying the assistant from scratch (this will reduce the start time).
 * Deploy to Docker Hub
 
