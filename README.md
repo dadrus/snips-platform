@@ -11,9 +11,11 @@ or [Raspiaudio MIC+ Snips tutorial](https://www.instructables.com/id/VOCAL-ASSIS
 
 - [Raspberry Pi 3](https://www.raspberrypi.org/products/raspberry-pi-3-model-b-plus/)
 - [Raspiaudio MIC+](https://www.raspiaudio.com/raspiaudio-aiy)
+- [ReSpeaker 2 Mic Array for PI](https://respeaker.io/2_mic_array/)
 
 ## Software-Stack
 
+### Driver for Raspiaudio MIC+
 As discribed from the creator of Raspiaudio [here](https://www.instructables.com/id/VOCAL-ASSISTANT-SnipsAi-Protects-Your-Privacy/)
 I've performed the following steps to install the required audio-driver
 after plugging the hat on my Pi host:
@@ -32,30 +34,17 @@ $ sudo bash test
 
 After pushing the yellow button one should hear “front left, front right” then a recording will be played indicating that the mic and speakers are working well.
 
-Or alternatively by using `aplay` and `arecord`. To list playback devices, run the following command:
+Or alternatively by using `aplay` and `arecord` to list the playback and
+record devices:
 
 ```.bash
 $ aplay -l
-```
-
-Which will produce something like this:
-
-```
 **** List of PLAYBACK Hardware Devices ****
 card 0: sndrpigooglevoi [snd_rpi_googlevoicehat_soundcar], device 0: Google voiceHAT SoundCard HiFi voicehat-hifi-0 []
   Subdevices: 1/1
   Subdevice #0: subdevice #0
-```
 
-And to list the audio capture devices, run the command:
-
-```.bash
 $ arecord -l
-```
-
-Now you should see something like this:
-
-```
 **** List of CAPTURE Hardware Devices ****
 card 0: sndrpigooglevoi [snd_rpi_googlevoicehat_soundcar], device 0: Google voiceHAT SoundCard HiFi voicehat-hifi-0 []
   Subdevices: 1/1
@@ -68,11 +57,88 @@ If you want to ensure, you can really record and playback execute and hit `CTRL-
 $ arecord -f cd out.wav
 ```
 
-This will save a file, **out.wav** containing the recording. To check that both, the microphone and the speaker are working 
-properly, run the following command
+followed by 
 
 ```.bash
 $ aplay out.wav
+```
+
+to check that both, the microphone and the speaker are working properly.
+
+It might be worth verifying that the installed playback and microphone devices can also be used in a docker container. For that
+simply run e.g. a `rasbian/stretch` container, make the playback and the microphone devices and the corresponding configuration
+available to it 
+
+```.bash
+$ docker run -ti --rm -v /etc/asound.conf --device /dev/snd raspbian/stretch /bin/bash
+```
+
+and repeat the tests described above in the container. You will have to install `alsa-utils` to be able to use `aplay` and `arecord`
+
+The official snips [Raspberry Pi - Manual Setup](https://docs.snips.ai/articles/raspberrypi/manual-setup) article sais, one would require
+to adjust the `asound.conf` configuration file to reference the appropriate playback and record devices.
+In my case the I was able to use the `/etc/asound.conf` as it is, without
+any modifications.
+
+###Driver for the ReSpeaker 2 Mic Array for PI
+
+As described on the [wiki Page](http://wiki.seeedstudio.com/ReSpeaker_2_Mics_Pi_HAT/)
+from seeedstudio one have to get the seeed voice card source code, install
+it and reboot the Raspberry PI.
+
+```.bash
+$ sudo apt-get update && sudo apt-get upgrade -y
+$ git clone https://github.com/respeaker/seeed-voicecard.git
+$ cd seeed-voicecard
+$ sudo ./install.sh
+$ sudo reboot -h now
+```
+
+The `install.sh` script will install all the required dependencies including
+the driver.
+
+In the next step one should verify, that the sound card is recognized by the
+system by using `aplay` and `arecord`
+
+```.bash
+$ aplay -l
+**** List of PLAYBACK Hardware Devices ****
+card 0: ALSA [bcm2835 ALSA], device 0: bcm2835 ALSA [bcm2835 ALSA]
+  Subdevices: 7/7
+  Subdevice #0: subdevice #0
+  Subdevice #1: subdevice #1
+  Subdevice #2: subdevice #2
+  Subdevice #3: subdevice #3
+  Subdevice #4: subdevice #4
+  Subdevice #5: subdevice #5
+  Subdevice #6: subdevice #6
+card 0: ALSA [bcm2835 ALSA], device 1: bcm2835 IEC958/HDMI [bcm2835 IEC958/HDMI]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+card 0: ALSA [bcm2835 ALSA], device 2: bcm2835 IEC958/HDMI1 [bcm2835 IEC958/HDMI1]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+card 1: seeed2micvoicec [seeed-2mic-voicecard], device 0: bcm2835-i2s-wm8960-hifi wm8960-hifi-0 []
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+
+$ arecord -l
+**** List of CAPTURE Hardware Devices ****
+card 1: seeed2micvoicec [seeed-2mic-voicecard], device 0: bcm2835-i2s-wm8960-hifi wm8960-hifi-0 []
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+```
+
+Compared  to Raspiaudio MIC+ device, one will see multiple entries and in
+both cases the device, we are interested in is `card 1, device 0`. This is
+important as, unlike the Raspiaudion MIC+, you'll need to reference them in you `asound.conf` you're going
+to mount into the container.
+
+To verify that the device is working, plug in a speaker or an earphone and
+type (hit `CTRL-C` to cancel):
+
+```.bash
+arecord -f cd -Dhw:1 | aplay -Dhw:1
 ```
 
 It might be worth verifying that the installed playback and microphone devices can also be used in a docker container. For that
@@ -83,16 +149,13 @@ available to it
 $ docker run -ti --rm -v /etc/asound.conf --device /dev/snd raspbian/stretch /bin/bash
 ```
 
-and repeat the tests described above in the container. You will have to install `alsa-utils` to be able to use `aplay` and `arecord`:
+and repeat the tests described above in the container. You will have to install `alsa-utils` to be able to use `aplay` and `arecord`
 
+Please note, that we just used the system `/etc/asound.conf` without
+modifications, as we're addressed the proper devices by using `-Dhw:1`
+`arecord` and `aplay` arguments.
 
-```.bash
-$ apt-get update && apt-get install -y alsa-utils
-```
-
-The official snips [Raspberry Pi - Manual Setup](https://docs.snips.ai/articles/raspberrypi/manual-setup) article sais, one would require
-to adjust the `asound.conf` configuration file to reference the appropriate playback and record devices. It seems the installation script
-for Raspiaudio MIC+ (see above) already does it, so no specific settings are required.
+###Snips Assistant & Docker Image
 
 Given the above prerequisites are in place, just follow the tutorial of your choice (e.g. one of the referenced above) to create your snips 
 assistant. When ready download it from the snips console (in the below right corner of the web page you'll find a button named *Deploy Assistant*).
@@ -115,6 +178,28 @@ The `run.sh` script expects by default two directories to be present in the same
 So before running it, ensure you either adjust the path to your *assistant* directory (created, when you've extracted the zip file, downloaded from
 the snips console) or move it to the directory `run.sh` is in and either create the *log* directory or delete the volume setting from the script if
 you don't need the system logs.
+
+If you're using the ReSpeaker hat, you'll also have to modify the
+`asound.conf` to by used by the container as described by the official snips [Raspberry Pi - Manual Setup](https://docs.snips.ai/articles/raspberrypi/manual-setup)
+article.
+
+```
+pcm.!default {
+  type asym
+  playback.pcm {
+    type plug
+    slave.pcm "hw:1,0"
+  }
+  capture.pcm {
+    type plug
+    slave.pcm "hw:1,0"
+  }
+}
+```
+
+If you are using Raspiaudio MIC+, replace `-v ${PWD}/asound.conf:/etc/asound.conf`
+by `-v /etc/asound.conf` in the `run.sh` script to use the default system
+configuration.
 
 Action time;)
 
@@ -172,6 +257,4 @@ Now you can talk to your assistant.
 * Set the timezone used by the host instead of using *Europe/Amsterdam*
 * Reuse already installed dependencies on restarting the docker container instead deploying the assistant from scratch (this will reduce the start time).
 * Deploy to Docker Hub
-
-
 
