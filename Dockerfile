@@ -1,22 +1,20 @@
-FROM raspbian/stretch 
+FROM raspbian/stretch
+#FROM arm32v7/debian:buster-slim
 
-ENV TZ=Europe/Amsterdam
-
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    echo $TZ > /etc/timezone && \
-    apt-get update && \
-    apt-get install -y apt-utils
-
-RUN apt-get dist-upgrade -y
-
-RUN apt-get install -y dirmngr apt-transport-https alsa-utils curl unzip python3-pip python3-pip git
-
+RUN apt-get update && apt-get dist-upgrade -y && \
+    apt-get install -y lsb-release dirmngr apt-utils apt-transport-https alsa-utils curl unzip python3-pip git
 RUN bash -c 'echo "deb https://raspbian.snips.ai/stretch stable main" > /etc/apt/sources.list.d/snips.list' && \
     apt-key adv --keyserver gpg.mozilla.org --recv-keys D4F50CDCA10A2849 && \
-    apt-get update && \
-    apt-get install -y snips-platform-voice snips-template snips-skill-server snips-watch snips-analytics
+    apt-get update
+RUN apt-get install -y snips-platform-voice snips-tts snips-watch snips-analytics snips-template snips-skill-server && \
+    pip3 install virtualenv
+# doesn't exist in raspbian repository
+#RUN apt-get install -y tini
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN pip3 install virtualenv
+ENV TINI_VERSION v0.18.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static-armhf /usr/bin/tini
+RUN chmod +x /usr/bin/tini
     
 RUN usermod -aG snips-skills-admin root
 
@@ -24,5 +22,6 @@ COPY start-snips.sh /bin/start-snips.sh
 
 EXPOSE 1883/tcp
 
+ENTRYPOINT ["/usr/bin/tini", "--"]
 
 CMD ["bash","/bin/start-snips.sh"]
